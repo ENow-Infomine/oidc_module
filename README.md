@@ -20,7 +20,7 @@ dependencies:
       url: https://github.com/ENow-Infomine/oidc_module.git
 
 ## 1. update your main.dart else logic of if (userInfo == null):
-
+```dart
 // Initialize the AuthorizedClient using the credential from your singleton
     final authClient = AuthorizedClient(oidcClient.credential);
 
@@ -36,9 +36,10 @@ dependencies:
       ),
     );
   }
+```
 
 ## 2. Usage in your pages:
-
+```dart
 class YourPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,7 @@ class YourPage extends StatelessWidget {
     );
   }
 }
+```
 
 ## Features
 
