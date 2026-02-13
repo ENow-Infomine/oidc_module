@@ -62,7 +62,7 @@ class YourPage extends StatelessWidget {
 ### 1 pom.xml (Add if missing)
 
 Add these to your existing <dependencies> section.
-
+```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
@@ -71,7 +71,7 @@ Add these to your existing <dependencies> section.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
-
+```
 ### 2 application.properties (Update)
 
 Update the issuer URI to use a placeholder that Kubernetes can override.
