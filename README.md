@@ -10,7 +10,7 @@ For general information about developing packages, see the Dart guide for
 and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
-
+## A. Front End
 ## 0. Include this repo in your project's pubspec.yaml:
 dependencies:
   ....
@@ -57,9 +57,9 @@ class YourPage extends StatelessWidget {
   }
 }
 ```
-1. Backend: Spring Boot Changes
-___________________________________________________________
-1.1 pom.xml (Add if missing)
+
+## B. Springboot back end
+### 1 pom.xml (Add if missing)
 
 Add these to your existing <dependencies> section.
 
@@ -71,16 +71,16 @@ Add these to your existing <dependencies> section.
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
-__________________________________________________________
-1.2 application.properties (Update)
+
+### 2 application.properties (Update)
 
 Update the issuer URI to use a placeholder that Kubernetes can override.
 code Properties
 
 # Add or update this line
 app.keycloak.base-url=${KEYCLOAK_BASE_URL:https://e-now.infomine.in/kc/realms/master}
-__________________________________________________________
-1.3 SecurityConfig.java (New or modify existing)
+
+### 3 SecurityConfig.java (New or modify existing)
 
 This is where the environment toggle lives. Create this class or update your existing Security configuration.
 ```java
@@ -130,26 +130,3 @@ public class SecurityConfig {
     }
 }
 ```
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
