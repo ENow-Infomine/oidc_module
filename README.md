@@ -12,7 +12,7 @@ and the Flutter guide for
 -->
 ## A. Front End
 ## 0. Include this repo in your project's pubspec.yaml:
-```yml
+```yaml
 dependencies:
   ....
   ....
