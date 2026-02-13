@@ -12,12 +12,14 @@ and the Flutter guide for
 -->
 ## A. Front End
 ## 0. Include this repo in your project's pubspec.yaml:
+```yml
 dependencies:
   ....
   ....
   oidc_module:
     git:
       url: https://github.com/ENow-Infomine/oidc_module.git
+```
 
 ## 1. update your main.dart else logic of if (userInfo == null):
 ```dart
