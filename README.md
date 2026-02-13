@@ -11,8 +11,46 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+## 0. Include this repo in your project's pubspec.yaml:
+  oidc_module:
+    git:
+      url: https://github.com/ENow-Infomine/oidc_module.git
+
+## 1. update your main.dart else logic of if (userInfo == null):
+
+// Initialize the AuthorizedClient using the credential from your singleton
+    final authClient = AuthorizedClient(oidcClient.credential);
+
+    runApp(
+      MultiProvider(
+        providers: [
+          // Provide the client so any page can use it
+          Provider<http.Client>.value(value: authClient),
+          // Also provide userInfo if you need it for the UI
+          Provider<UserInfo>.value(value: userInfo),
+        ],
+        child: MyApp(),
+      ),
+    );
+  }
+
+## 2. Usage in your pages:
+class YourPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Get the client (it will be an instance of AuthorizedClient)
+    final client = Provider.of<http.Client>(context);
+
+    return ElevatedButton(
+      onPressed: () async {
+        // This call automatically includes the Bearer token and handles refresh!
+        final response = await client.get(Uri.parse("https://api.myapp.com/user/profile"));
+        print(response.body);
+      },
+      child: Text("Load Profile"),
+    );
+  }
+}
 
 ## Features
 
