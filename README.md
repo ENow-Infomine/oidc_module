@@ -12,6 +12,9 @@ and the Flutter guide for
 -->
 
 ## 0. Include this repo in your project's pubspec.yaml:
+dependencies:
+  ....
+  ....
   oidc_module:
     git:
       url: https://github.com/ENow-Infomine/oidc_module.git
@@ -35,6 +38,7 @@ and the Flutter guide for
   }
 
 ## 2. Usage in your pages:
+
 class YourPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
