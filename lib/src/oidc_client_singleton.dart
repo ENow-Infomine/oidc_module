@@ -13,7 +13,7 @@ class OIDCClient {
   var scopes = ['openid', 'profile', 'basic', 'email', 'offline_access'];
 
   //Client? _client;
-  Credential? _credential;
+  Credential? credential;
 
   static OIDCClient getInstance(String clientId, String clientSecret) {
     _instance ??= OIDCClient._internal(clientId, clientSecret);
@@ -23,9 +23,9 @@ class OIDCClient {
   Future<UserInfo?> getUserInfo() async {
     print("Inside getUserInfo()");
     await _getRedirectResult();
-    if (_credential != null) {
+    if (credential != null) {
       //print('print1');
-      return _credential!.getUserInfo();
+      return credential!.getUserInfo();
     } else {
       return null;
     }
@@ -55,8 +55,8 @@ class OIDCClient {
       //try {
       var responseUri = Uri.parse(responseUrl);
       print("Before flow.callback");
-      _credential = await flow.callback(responseUri.queryParameters);
-      print("Inside getRedirctReslst() : after credentials : $_credential");
+      credential = await flow.callback(responseUri.queryParameters);
+      print("Inside getRedirctReslst() : after credentials : $credential");
       _cleanupStorage();
       //}
     }
@@ -104,7 +104,7 @@ class OIDCClient {
 
   Future<void> logOut() async {
     print("Inside logOut");
-    final logOutURI = _credential!.generateLogoutUrl().toString();
+    final logOutURI = credential!.generateLogoutUrl().toString();
     _cleanupStorage();
     //print("logOutUri in 2nd app: $logOutURI");
     window.open(logOutURI, '_self');
