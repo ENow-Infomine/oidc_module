@@ -11,15 +11,15 @@ class AuthorizedClient extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     if (credential != null) {
       try {
-        // Proactive Refresh with 60s Buffer
+        // Refresh check with 60-second buffer
         var response = await credential!.getTokenResponse();
         if (response.expiresAt!.difference(DateTime.now()).inSeconds < 60) {
           response = await credential!.getTokenResponse(true);
         }
         request.headers['Authorization'] = 'Bearer ${response.accessToken}';
       } catch (e) {
-        // In "no-auth" dev mode, this might fail but we let the request proceed
-        print("Auth header skipped: $e");
+        // Fallback for Dev "no-auth" mode: send without header
+        print("Auth Header Injection Skipped: $e");
       }
     }
     return _inner.send(request);

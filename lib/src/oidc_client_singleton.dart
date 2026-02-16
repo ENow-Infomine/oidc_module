@@ -1,6 +1,8 @@
 import 'dart:math';
-import 'dart:html';
+import 'dart:html' as html;
+import 'package:http/http.dart' as http;
 import 'package:openid_client/openid_client.dart';
+import 'authorized_client.dart';
 
 class OIDCClient {
   static OIDCClient? _instance;
@@ -9,10 +11,11 @@ class OIDCClient {
 
   final String _clientId;
   final String _clientSecret;
+  
+  // Placeholder replaced by entrypoint.sh at runtime in MicroK8s
   final Uri discoveryUri = Uri.parse("API_REALMS_URL_PLACEHOLDER");
-  var scopes = ['openid', 'profile', 'basic', 'email', 'offline_access'];
-
-  //Client? _client;
+  
+  final List<String> scopes = ['openid', 'profile', 'email', 'offline_access'];
   Credential? credential;
 
   static OIDCClient getInstance(String clientId, String clientSecret) {
@@ -20,99 +23,83 @@ class OIDCClient {
     return _instance!;
   }
 
-  Future<UserInfo?> getUserInfo() async {
-    print("Inside getUserInfo()");
+  /// Encapsulates library types by returning a standard Map
+  Future<Map<String, dynamic>?> getJsonUserInfo() async {
     await _getRedirectResult();
     if (credential != null) {
-      //print('print1');
-      return credential!.getUserInfo();
-    } else {
-      return null;
+      final info = await credential!.getUserInfo();
+      return info.toJson();
     }
+    return null;
+  }
+
+  /// Factory for the specialized HTTP client
+  http.Client createHttpClient() {
+    return AuthorizedClient(credential);
   }
 
   Future<void> _getRedirectResult() async {
-    print("Inside getRedirctReslst()");
-    var responseUrl = window.sessionStorage["auth_callback_response_url"];
-
+    var responseUrl = html.window.sessionStorage["auth_callback_response_url"];
     if (responseUrl != null) {
-      var codeVerifier = window.sessionStorage["auth_code_verifier"];
-      var state = window.sessionStorage["auth_state"];
-
-      Client? client;
-      client = await _getClient();
+      var codeVerifier = html.window.sessionStorage["auth_code_verifier"];
+      var state = html.window.sessionStorage["auth_state"];
+      
+      var issuer = await Issuer.discover(discoveryUri);
+      var client = Client(issuer, _clientId, clientSecret: _clientSecret);
 
       var flow = Flow.authorizationCodeWithPKCE(
-        client!,
+        client,
         scopes: scopes,
         codeVerifier: codeVerifier,
         state: state,
-      );
-      flow.redirectUri = Uri.parse(
-          '${window.location.protocol}//${window.location.host}${window.location.pathname}');
+      )..redirectUri = Uri.parse(
+          '${html.window.location.protocol}//${html.window.location.host}${html.window.location.pathname}');
 
-      // handle callback
-      //try {
       var responseUri = Uri.parse(responseUrl);
-      print("Before flow.callback");
       credential = await flow.callback(responseUri.queryParameters);
-      print("Inside getRedirctReslst() : after credentials : $credential");
       _cleanupStorage();
-      //}
     }
-  }
-
-  Future<Client?> _getClient() async {
-    var issuer = await Issuer.discover(discoveryUri);
-    return Client(issuer, _clientId, clientSecret: _clientSecret);
-  }
-
-  String _randomString(int length) {
-    var r = Random.secure();
-    var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    return Iterable.generate(length, (_) => chars[r.nextInt(chars.length)])
-        .join();
   }
 
   void authenticate() async {
     var codeVerifier = _randomString(50);
     var state = _randomString(20);
-    //var responseUrl;
-
-    Client? client;
-    client = await _getClient();
+    
+    var issuer = await Issuer.discover(discoveryUri);
+    var client = Client(issuer, _clientId, clientSecret: _clientSecret);
 
     var flow = Flow.authorizationCodeWithPKCE(
-      client!,
+      client,
       scopes: scopes,
       codeVerifier: codeVerifier,
       state: state,
-    );
-    print("Inside authenticate() : after authorizationCodeWithPKCE");
-    flow.redirectUri = Uri.parse(
-        '${window.location.protocol}//${window.location.host}${window.location.pathname}');
-    print("Inside authenticate() : flow.redirectUri : $flow.redirectUri");
+    )..redirectUri = Uri.parse(
+        '${html.window.location.protocol}//${html.window.location.host}${html.window.location.pathname}');
 
-    // redirect to auth server
-    window.sessionStorage["auth_code_verifier"] = codeVerifier;
-    window.sessionStorage["auth_state"] = state;
-    var authorizationUrl = flow.authenticationUri;
-    window.location.href = authorizationUrl.toString();
-    print("Inside responseUrl == null block");
+    html.window.sessionStorage["auth_code_verifier"] = codeVerifier;
+    html.window.sessionStorage["auth_state"] = state;
+    html.window.location.href = flow.authenticationUri.toString();
     throw "Authenticating...";
   }
 
-  Future<void> logOut() async {
-    print("Inside logOut");
-    final logOutURI = credential!.generateLogoutUrl().toString();
+  void logOut() {
+    if (credential == null) return;
+    final logoutUrl = credential!.generateLogoutUrl(
+      redirectUri: Uri.parse('${html.window.location.origin}${html.window.location.pathname}'),
+    );
     _cleanupStorage();
-    //print("logOutUri in 2nd app: $logOutURI");
-    window.open(logOutURI, '_self');
+    html.window.location.assign(logoutUrl.toString());
   }
 
   void _cleanupStorage() {
-    window.sessionStorage.remove("auth_code_verifier");
-    window.sessionStorage.remove("auth_callback_response_url");
-    window.sessionStorage.remove("auth_state");
+    html.window.sessionStorage.remove("auth_code_verifier");
+    html.window.sessionStorage.remove("auth_callback_response_url");
+    html.window.sessionStorage.remove("auth_state");
+  }
+
+  String _randomString(int length) {
+    var r = Random.secure();
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    return Iterable.generate(length, (_) => chars[r.nextInt(chars.length)]).join();
   }
 }
