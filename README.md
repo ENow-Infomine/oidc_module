@@ -11,54 +11,18 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 ## A. Front End
-## 0. Include this repo in your project's pubspec.yaml:
+## 0. Include provider library & oidc_module github repo (this repo) in your project's pubspec.yaml:
 ```yaml
 dependencies:
   ....
-  ....
+  provider: ^6.0.5 
   oidc_module:
     git:
       url: https://github.com/ENow-Infomine/oidc_module.git
 ```
+## 1. update your main.dart logic as per sampleapp/main.dart in this repo
 
-## 1. update your main.dart else logic of if (userInfo == null):
-```dart
-// Initialize the AuthorizedClient using the credential from your singleton
-    final authClient = AuthorizedClient(oidcClient.credential);
-
-    runApp(
-      MultiProvider(
-        providers: [
-          // Provide the client so any page can use it
-          Provider<http.Client>.value(value: authClient),
-          // Also provide userInfo if you need it for the UI
-          Provider<UserInfo>.value(value: userInfo),
-        ],
-        child: MyApp(),
-      ),
-    );
-  }
-```
-
-## 2. Usage in your pages:
-```dart
-class YourPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // Get the client (it will be an instance of AuthorizedClient)
-    final client = Provider.of<http.Client>(context);
-
-    return ElevatedButton(
-      onPressed: () async {
-        // This call automatically includes the Bearer token and handles refresh!
-        final response = await client.get(Uri.parse("https://api.myapp.com/user/profile"));
-        print(response.body);
-      },
-      child: Text("Load Profile"),
-    );
-  }
-}
-```
+## 2. Usage in your pages where backend calls take place as per sampleapp/riskadminmain-configuration.dart
 
 ## B. Springboot back end
 ### 1 pom.xml (Add if missing)
