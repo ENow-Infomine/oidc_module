@@ -23,6 +23,10 @@ class OIDCClient {
     return _instance!;
   }
 
+  http.Client createHttpClient() {
+    return AuthorizedClient(credential);
+  }
+
   /// Encapsulates library types by returning a standard Map
   Future<Map<String, dynamic>?> getJsonUserInfo() async {
     await _getRedirectResult();

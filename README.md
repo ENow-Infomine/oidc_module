@@ -11,18 +11,21 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 ## A. Front End
-### 0. Include provider library & oidc_module github repo (this repo) in your project's pubspec.yaml:
+### 0. Include oidc_module github repo (this repo) in your project's pubspec.yaml:
 ```yaml
 dependencies:
   ....
-  provider: ^6.0.5 
+  ....
   oidc_module:
     git:
       url: https://github.com/ENow-Infomine/oidc_module.git
 ```
 ### 1. update your main.dart logic as per sampleapp/main.dart in this repo
 
-### 2. Usage in your pages where backend calls take place as per sampleapp/riskadminmain-configuration.dart
+### 2. In your IDE (VS Code or Android Studio), use Global Search and Replace:
+    Search for: http.get( -> Replace with: global.api.get(
+    Search for: http.post( -> Replace with: global.api.post(
+    .... Repeat for other http. methods like put, delete, ...
 
 ## B. Springboot back end
 ### 1 pom.xml (Add if missing)
