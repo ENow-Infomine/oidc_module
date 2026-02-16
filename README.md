@@ -44,7 +44,7 @@ Update the issuer URI to use a placeholder that Kubernetes can override.
 code Properties
 
 # Add or update this line
-app.keycloak.base-url=${KEYCLOAK_BASE_URL:https://e-now.infomine.in/kc/realms/master}
+app.keycloak.base-url=${KEYCLOAK_BASE_URL:https://e-now.infomine.in/kc/realms}
 
 ### 3 SecurityConfig.java (New or modify existing)
 
