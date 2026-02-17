@@ -92,7 +92,7 @@ class OIDCClient {
       redirectUri: Uri.parse('${html.window.location.origin}${html.window.location.pathname}'),
     );
     _cleanupStorage();
-    html.window.location.assign(logoutUrl.toString());
+    html.window.location.replace(logoutUrl.toString());
   }
 
   void _cleanupStorage() {
