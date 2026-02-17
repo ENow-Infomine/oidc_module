@@ -23,10 +23,6 @@ class OIDCClient {
     return _instance!;
   }
 
-  http.Client createHttpClient() {
-    return AuthorizedClient(credential);
-  }
-
   /// Encapsulates library types by returning a standard Map
   Future<Map<String, dynamic>?> getJsonUserInfo() async {
     await _getRedirectResult();
@@ -87,7 +83,11 @@ class OIDCClient {
   }
 
   void logOut() {
-    if (credential == null) return;
+    if (credential == null) {
+      // If no credential, just go to the home page to trigger login
+      html.window.location.assign(html.window.location.origin);
+      return;
+    }
     final logoutUrl = credential!.generateLogoutUrl(
       redirectUri: Uri.parse('${html.window.location.origin}${html.window.location.pathname}'),
     );
