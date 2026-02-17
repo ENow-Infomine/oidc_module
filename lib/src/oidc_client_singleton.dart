@@ -24,11 +24,11 @@ class OIDCClient {
   }
 
   /// Encapsulates library types by returning a standard Map
-  Future<Map<String, dynamic>?> getJsonUserInfo() async {
+  Future<UserInfo?> getJsonUserInfo() async {
     await _getRedirectResult();
     if (credential != null) {
       final info = await credential!.getUserInfo();
-      return info.toJson();
+      return info;
     }
     return null;
   }

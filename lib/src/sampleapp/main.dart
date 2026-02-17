@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:oidc_module/oidc_module.dart';
+import 'package:openid_client/src/model.dart';
 import 'business_unit_role_mapping/business_unit_role_mapping.dart';
 import 'shared/global.dart' as global;
 // Import your screens...
@@ -14,7 +15,7 @@ Future<void> main() async {
   );
   
   // 2. Blocking Login Check
-  Map<String, dynamic>? userInfo = await oidcClient.getJsonUserInfo();
+  UserInfo? userInfo = await oidcClient.getJsonUserInfo();
 
   if (userInfo == null) {
     oidcClient.authenticate();
@@ -27,7 +28,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final Map<String, dynamic> userInfo;
+  final UserInfo userInfo;
   final OIDCClient oidcClient;
 
   const MyApp({super.key, required this.userInfo, required this.oidcClient});
