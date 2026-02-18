@@ -25,9 +25,11 @@ import 'package:http/http.dart' as http;
 
 // --- ADD THIS LINE ---
 // This will be initialized in main.dart and used in all services
+
 late http.Client api; 
 
 // Navigator key to allow IdleManager to show dialogs anywhere
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 ### 2. update your main.dart logic as per sampleapp/main.dart in this repo
