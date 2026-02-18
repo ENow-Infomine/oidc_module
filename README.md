@@ -20,9 +20,19 @@ dependencies:
     git:
       url: https://github.com/ENow-Infomine/oidc_module.git
 ```
-### 1. update your main.dart logic as per sampleapp/main.dart in this repo
+### 1. update global.dart with the below:
+import 'package:http/http.dart' as http;
 
-### 2. In your IDE (VS Code or Android Studio), use Global Search and Replace:
+// --- ADD THIS LINE ---
+// This will be initialized in main.dart and used in all services
+late http.Client api; 
+
+// Navigator key to allow IdleManager to show dialogs anywhere
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+### 2. update your main.dart logic as per sampleapp/main.dart in this repo
+
+### 3. In your IDE (VS Code or Android Studio), use Global Search and Replace:
     Search for: http.get( -> Replace with: global.api.get(
     Search for: http.post( -> Replace with: global.api.post(
     .... Repeat for other http. methods like put, delete, ...
