@@ -7,19 +7,16 @@ import 'authorized_client.dart';
 class OIDCClient {
   static OIDCClient? _instance;
 
-  OIDCClient._internal(this._clientId, this._clientSecret);
+  OIDCClient._internal(this._clientId, this._discoveryUri);
 
   final String _clientId;
-  final String _clientSecret;
-  
-  // Placeholder replaced by entrypoint.sh at runtime in MicroK8s
-  final Uri discoveryUri = Uri.parse("API_REALMS_URL_PLACEHOLDER");
+  final String _discoveryUri;
   
   final List<String> scopes = ['openid', 'profile', 'email', 'offline_access'];
   Credential? credential;
 
-  static OIDCClient getInstance(String clientId, String clientSecret) {
-    _instance ??= OIDCClient._internal(clientId, clientSecret);
+  static OIDCClient getInstance(String clientId, String discoveryUri) {
+    _instance ??= OIDCClient._internal(clientId, discoveryUri);
     return _instance!;
   }
 
@@ -44,8 +41,8 @@ class OIDCClient {
       var codeVerifier = html.window.sessionStorage["auth_code_verifier"];
       var state = html.window.sessionStorage["auth_state"];
       
-      var issuer = await Issuer.discover(discoveryUri);
-      var client = Client(issuer, _clientId, clientSecret: _clientSecret);
+      var issuer = await Issuer.discover(Uri.parse(_discoveryUri));
+      var client = Client(issuer, _clientId);
 
       var flow = Flow.authorizationCodeWithPKCE(
         client,
@@ -65,8 +62,8 @@ class OIDCClient {
     var codeVerifier = _randomString(50);
     var state = _randomString(20);
     
-    var issuer = await Issuer.discover(discoveryUri);
-    var client = Client(issuer, _clientId, clientSecret: _clientSecret);
+    var issuer = await Issuer.discover(Uri.parse(_discoveryUri));
+    var client = Client(issuer, _clientId);
 
     var flow = Flow.authorizationCodeWithPKCE(
       client,

@@ -10,8 +10,8 @@ Future<void> main() async {
 
   // 1. Initialize Singleton
   var oidcClient = OIDCClient.getInstance(
-    "API_CLIENTID_URL_PLACEHOLDER", 
-    "API_CLIENTSEC_URL_PLACEHOLDER"
+    "API_CLIENTID_URL_PLACEHOLDER",
+    "API_REALMS_URL_PLACEHOLDER",
   );
   
   // 2. Blocking Login Check
