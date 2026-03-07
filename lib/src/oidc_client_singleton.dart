@@ -12,10 +12,17 @@ class OIDCClient {
   final String _clientId;
   final String _discoveryUri;
   
+    // Helper to generate unique keys for this specific client
+  String _key(String base) => "${_clientId}_$base";
+
   final List<String> scopes = ['openid', 'profile', 'email', 'offline_access'];
   Credential? credential;
 
   static OIDCClient getInstance(String clientId, String discoveryUri) {
+        // you might need to allow the instance to be replaced if the ID changes
+    if (_instance != null && _instance!._clientId != clientId) {
+      _instance = OIDCClient._internal(clientId, discoveryUri);
+    }
     _instance ??= OIDCClient._internal(clientId, discoveryUri);
     return _instance!;
   }
@@ -36,11 +43,11 @@ class OIDCClient {
   }
 
   Future<void> _getRedirectResult() async {
-    var responseUrl = html.window.sessionStorage["auth_callback_response_url"];
+    var responseUrl = html.window.sessionStorage[_key("auth_callback_response_url")];
     if (responseUrl != null) {
-      var codeVerifier = html.window.sessionStorage["auth_code_verifier"];
-      var state = html.window.sessionStorage["auth_state"];
-      
+      var codeVerifier = html.window.sessionStorage[_key("auth_code_verifier")];
+      var state = html.window.sessionStorage[_key("auth_state")];
+
       var issuer = await Issuer.discover(Uri.parse(_discoveryUri));
       var client = Client(issuer, _clientId);
 
@@ -53,8 +60,14 @@ class OIDCClient {
           '${html.window.location.protocol}//${html.window.location.host}${html.window.location.pathname}');
 
       var responseUri = Uri.parse(responseUrl);
-      credential = await flow.callback(responseUri.queryParameters);
-      _cleanupStorage();
+      try {
+        credential = await flow.callback(responseUri.queryParameters);
+        _cleanupStorage();        
+      } catch (e) {
+        print("Error occurred while processing redirect result: $e");
+        _cleanupStorage();
+      }
+
     }
   }
 
@@ -73,8 +86,8 @@ class OIDCClient {
     )..redirectUri = Uri.parse(
         '${html.window.location.protocol}//${html.window.location.host}${html.window.location.pathname}');
 
-    html.window.sessionStorage["auth_code_verifier"] = codeVerifier;
-    html.window.sessionStorage["auth_state"] = state;
+    html.window.sessionStorage[_key("auth_code_verifier")] = codeVerifier;
+    html.window.sessionStorage[_key("auth_state")] = state;
     html.window.location.href = flow.authenticationUri.toString();
     throw "Authenticating...";
   }
@@ -93,9 +106,9 @@ class OIDCClient {
   }
 
   void _cleanupStorage() {
-    html.window.sessionStorage.remove("auth_code_verifier");
-    html.window.sessionStorage.remove("auth_callback_response_url");
-    html.window.sessionStorage.remove("auth_state");
+    html.window.sessionStorage.remove(_key("auth_code_verifier"));
+    html.window.sessionStorage.remove(_key("auth_callback_response_url"));
+    html.window.sessionStorage.remove(_key("auth_state"));
   }
 
   String _randomString(int length) {
