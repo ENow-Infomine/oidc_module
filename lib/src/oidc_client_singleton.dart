@@ -92,14 +92,14 @@ class OIDCClient {
     throw "Authenticating...";
   }
 
-  void logOut() {
+  void logOut(required String logoutUri) {
     if (credential == null) {
       // If no credential, just go to the home page to trigger login
-      html.window.location.assign(html.window.location.origin);
+      html.window.location.assign(logoutUri);
       return;
     }
     final logoutUrl = credential!.generateLogoutUrl(
-      redirectUri: Uri.parse('${html.window.location.origin}${html.window.location.pathname}'),
+      redirectUri: Uri.parse(logoutUri),
     );
     _cleanupStorage();
     html.window.location.replace(logoutUrl.toString());
