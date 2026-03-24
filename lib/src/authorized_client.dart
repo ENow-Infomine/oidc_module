@@ -1,6 +1,5 @@
 import 'package:http/http.dart' as http;
 import 'package:openid_client/openid_client.dart';
-
 import 'oidc_client_singleton.dart';
 
 class AuthorizedClient extends http.BaseClient {
@@ -11,6 +10,10 @@ class AuthorizedClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
+    String host = Uri.base.host;
+    List<String> parts = host.split('.');
+    String orgId = parts[0];
+    
     if (credential != null) {
       var response;
       try {
@@ -22,7 +25,7 @@ class AuthorizedClient extends http.BaseClient {
         
         // TRIGGER LOGOUT
         // This clears local state and redirects to Keycloak to kill the cookie
-        OIDCClient.getInstance("", "").logOut(); 
+        OIDCClient.getInstance("", "").logOut("https://${orgId}." + "FRONTEND_BASE_URL_PLACEHOLDER" + "/" + "LANDING_APPID_PLACEHOLDER");
         
         // Throw an error to stop the current API call from proceeding
         throw Exception("Session Expired");        
