@@ -92,7 +92,7 @@ class OIDCClient {
     throw "Authenticating...";
   }
 
-  void logOut(required String logoutUri) {
+  void logOut(String logoutUri) {
     if (credential == null) {
       // If no credential, just go to the home page to trigger login
       html.window.location.assign(logoutUri);
